@@ -170,6 +170,33 @@ class _EmailLoginState extends State<EmailLogin> {
             ),
           ),
         ),
+
+        //////////////////////////////////////////////////////////////////
+        Container(
+          margin: EdgeInsets.only(top: 15),
+          width: double.infinity,
+          height: 48,
+          child: ElevatedButton.icon(
+            onPressed: () {
+              Navigator.of(context).pushNamed('products');
+            },
+            label: Text(
+              'PRODUCTS',
+              style: TextStyle(
+                fontSize: 15,
+                color: AppColors.normal,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.success0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: BorderSide(color: AppColors.neutral20, width: 1),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }

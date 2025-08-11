@@ -9,6 +9,8 @@ import 'package:together_test/bottomTabs/home.dart';
 import 'package:together_test/bottomTabs/more.dart';
 import 'package:together_test/auth/resetPassword.dart';
 import 'package:together_test/bottomTabs/programs.dart';
+import 'package:together_test/dio/dio_helper.dart';
+import 'package:together_test/dio/products.dart';
 import 'package:together_test/more/aboutUs.dart';
 import 'package:together_test/more/faq.dart';
 import 'package:together_test/more/privacyPolicy.dart';
@@ -22,6 +24,7 @@ import 'package:together_test/programDetails.dart';
 import 'package:together_test/splash.dart';
 
 void main() {
+  DioHelper.init();
   runApp(const MyApp());
 }
 
@@ -54,6 +57,7 @@ class MyApp extends StatelessWidget {
         'termsAndConditions': (context) => TermsAndConditions(),
         'subscriptions': (context) => Subscriptions(),
         'transactionHistory': (context) => TransactionHistory(),
+        'products': (context) => Products(),
       },
     );
   }
