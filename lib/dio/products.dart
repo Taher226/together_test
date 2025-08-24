@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:together_test/constants/colors.dart';
-import 'package:together_test/dio/dio_helper.dart';
+import 'package:together_test/core/config/theme/colors.dart';
+import 'package:together_test/core/network/dio_helper.dart';
 import 'package:together_test/dio/dio_model.dart';
 
 class Products extends StatefulWidget {
@@ -17,8 +17,6 @@ class _ProductsState extends State<Products> {
   TextEditingController categoryController = TextEditingController();
   TextEditingController ratingRateController = TextEditingController();
   TextEditingController ratingCountController = TextEditingController();
-
-  //int id = 1;
 
   List<ProductModel> allProducts = [];
   List<ProductModel> filteredProducts = [];
