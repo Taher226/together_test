@@ -3,7 +3,7 @@ import 'package:together_test/core/widgets/otpBox.dart';
 import 'package:together_test/core/config/theme/colors.dart';
 
 class OtpModal extends StatefulWidget {
-  final VoidCallback onPress;
+  final void Function(String otpCode) onPress;
   const OtpModal({super.key, required this.onPress});
 
   @override
@@ -19,6 +19,18 @@ class _OtpModalState extends State<OtpModal> {
   final FocusNode focusNode2 = FocusNode();
   final FocusNode focusNode3 = FocusNode();
   final FocusNode focusNode4 = FocusNode();
+  String getOtpCode() {
+    return controller1.text +
+        controller2.text +
+        controller3.text +
+        controller4.text;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -123,7 +135,11 @@ class _OtpModalState extends State<OtpModal> {
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: widget.onPress,
+                  onPressed: () {
+                    final otpCode = getOtpCode();
+                    debugPrint("OTP ENTERED: $otpCode"); //
+                    widget.onPress(otpCode);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(

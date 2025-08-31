@@ -96,7 +96,7 @@ class _ProfileState extends State<Profile> {
       context: context,
       builder: (context) {
         return OtpModal(
-          onPress: () {
+          onPress: (otpCode) {
             Navigator.of(context).pop();
           },
         );

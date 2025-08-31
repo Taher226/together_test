@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:together_test/core/utils/form_validators.dart';
+import 'package:together_test/features/auth/data/repositories/check_email_repository.dart';
 import 'package:together_test/features/auth/presentation/widgets/screenLayout.dart';
 import 'package:together_test/core/config/theme/colors.dart';
 
@@ -8,7 +10,40 @@ class EmailLogin extends StatefulWidget {
 }
 
 class _EmailLoginState extends State<EmailLogin> {
+  final formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
+  final CheckEmailRepository repository = CheckEmailRepository();
+  bool isLoading = false;
+
+  void checkEmail() async {
+    if (!formKey.currentState!.validate()) return;
+
+    setState(() => isLoading = true);
+
+    try {
+      final result = await repository.checkEmail(emailController.text.trim());
+
+      if (result.success == true) {
+        Navigator.pushNamed(
+          context,
+          "passwordLogin",
+          arguments: {'email': emailController.text},
+        );
+      } else if (result.success == false) {
+        Navigator.pushNamed(
+          context,
+          "register",
+          arguments: {'email': emailController.text},
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,28 +85,35 @@ class _EmailLoginState extends State<EmailLogin> {
             ),
           ),
         ),
-        TextFormField(
-          onTapOutside: (event) {
-            FocusScope.of(context).unfocus();
-          },
+        Form(
+          key: formKey,
+          child: TextFormField(
+            onTapOutside: (event) {
+              FocusScope.of(context).unfocus();
+            },
+            validator: (value) => FormValidators.validateEmail(value),
+            controller: emailController,
+            keyboardType: TextInputType.emailAddress,
+            cursorColor: AppColors.primary,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.all(10),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AppColors.primary, width: 1),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AppColors.placeholder, width: 1),
+              ),
 
-          controller: emailController,
-          keyboardType: TextInputType.emailAddress,
-          cursorColor: AppColors.primary,
-          decoration: InputDecoration(
-            contentPadding: EdgeInsets.all(10),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: AppColors.placeholder, width: 1),
-            ),
-
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: AppColors.primary, width: 1),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: AppColors.error0, width: 1),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AppColors.primary, width: 1),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AppColors.error0, width: 1),
+              ),
             ),
           ),
         ),
@@ -81,23 +123,24 @@ class _EmailLoginState extends State<EmailLogin> {
           width: double.infinity,
           height: 48,
           child: ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pushNamed('passwordLogin');
-            },
+            onPressed: isLoading ? null : checkEmail,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: Text(
-              'Next',
-              style: TextStyle(
-                fontSize: 15,
-                color: AppColors.neutral100,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            child:
+                isLoading
+                    ? CircularProgressIndicator(color: AppColors.primary)
+                    : Text(
+                      'Next',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: AppColors.neutral100,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
           ),
         ),
 
@@ -163,33 +206,6 @@ class _EmailLoginState extends State<EmailLogin> {
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.neutral100,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-                side: BorderSide(color: AppColors.neutral20, width: 1),
-              ),
-            ),
-          ),
-        ),
-
-        //////////////////////////////////////////////////////////////////
-        Container(
-          margin: EdgeInsets.only(top: 15),
-          width: double.infinity,
-          height: 48,
-          child: ElevatedButton.icon(
-            onPressed: () {
-              Navigator.of(context).pushNamed('products');
-            },
-            label: Text(
-              'PRODUCTS',
-              style: TextStyle(
-                fontSize: 15,
-                color: AppColors.normal,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.success0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
                 side: BorderSide(color: AppColors.neutral20, width: 1),

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-List organizations = [
-  {'title': 'Hands for charity', 'icon': 'images/handsLogo.png'},
-  {'title': 'Global Giving', 'icon': 'images/globalLogo.png'},
-  {'title': 'Crow Rise', 'icon': 'images/crowLogo.png'},
-  {'title': 'Hands for charity', 'icon': 'images/handsLogo.png'},
-  {'title': 'Global Giving', 'icon': 'images/globalLogo.png'},
-  {'title': 'Crow Rise', 'icon': 'images/crowLogo.png'},
-];
+// List organizations = [
+//   {'title': 'Hands for charity', 'icon': 'images/handsLogo.png'},
+//   {'title': 'Global Giving', 'icon': 'images/globalLogo.png'},
+//   {'title': 'Crow Rise', 'icon': 'images/crowLogo.png'},
+//   {'title': 'Hands for charity', 'icon': 'images/handsLogo.png'},
+//   {'title': 'Global Giving', 'icon': 'images/globalLogo.png'},
+//   {'title': 'Crow Rise', 'icon': 'images/crowLogo.png'},
+// ];
 List campaigns = [
   {'name': 'Winter Campaign', 'logo': 'images/campaignHome.png'},
   {'name': 'Spring Campaign', 'logo': 'images/campaignHome.png'},

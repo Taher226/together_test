@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:together_test/features/auth/data/repositories/register_repository.dart';
+import 'package:together_test/features/auth/data/repositories/send_otp_repository.dart';
+import 'package:together_test/features/auth/data/repositories/verify_email_repository.dart';
+import 'package:together_test/features/auth/presentation/bloc/register/register_bloc.dart';
+import 'package:together_test/features/auth/presentation/bloc/sendOtp/send_otp_bloc.dart';
+import 'package:together_test/features/auth/presentation/bloc/verifyEmail/verify_email_bloc.dart';
 import 'package:together_test/features/auth/presentation/pages/emailLogin.dart';
 import 'package:together_test/features/auth/presentation/pages/passwordLogin.dart';
 import 'package:together_test/features/auth/presentation/pages/register.dart';
@@ -10,7 +17,6 @@ import 'package:together_test/features/more/presentation/pages/more.dart';
 import 'package:together_test/features/auth/presentation/pages/resetPassword.dart';
 import 'package:together_test/features/programs/presentation/pages/programs.dart';
 import 'package:together_test/core/network/dio_helper.dart';
-import 'package:together_test/dio/products.dart';
 import 'package:together_test/features/more/presentation/pages/aboutUs.dart';
 import 'package:together_test/features/more/presentation/pages/faq.dart';
 import 'package:together_test/features/more/presentation/pages/privacyPolicy.dart';
@@ -24,8 +30,17 @@ import 'package:together_test/features/programs/presentation/pages/programDetail
 import 'package:together_test/features/splash/presentation/pages/splash.dart';
 
 void main() {
-  DioHelper.init();
-  runApp(const MyApp());
+  DioHelper.init(null);
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => RegisterBloc(RegisterRepository())),
+        BlocProvider(create: (_) => SendOtpBloc(SendOtpRepository())),
+        BlocProvider(create: (_) => VerifyEmailBloc(VerifyEmailRepository())),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -57,7 +72,6 @@ class MyApp extends StatelessWidget {
         'termsAndConditions': (context) => TermsAndConditions(),
         'subscriptions': (context) => Subscriptions(),
         'transactionHistory': (context) => TransactionHistory(),
-        'products': (context) => Products(),
       },
     );
   }

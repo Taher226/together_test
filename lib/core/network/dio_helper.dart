@@ -2,10 +2,14 @@ import 'package:dio/dio.dart';
 
 class DioHelper {
   static late Dio dio;
-  static init() {
+  static init(String? domainUrl) {
+    String base = (domainUrl ?? 'https://api-test.togetherapps.ca/');
+    if (!base.endsWith('/')) {
+      base = '$base/';
+    }
     dio = Dio(
       BaseOptions(
-        baseUrl: 'https://fakestoreapi.com/',
+        baseUrl: base,
         receiveDataWhenStatusError: true,
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 10),
@@ -32,7 +36,12 @@ class DioHelper {
   }) async {
     dio.options.headers['Authorization'] =
         token != null ? 'Bearer $token' : null;
-    return await dio.post(url, data: data, queryParameters: query);
+    return await dio.post(
+      url,
+      data: data,
+      queryParameters: query,
+      options: Options(validateStatus: (_) => true),
+    );
   }
 
   static Future<Response> putData({
