@@ -37,6 +37,23 @@ class _RegisterState extends State<Register> {
   String? selectedProvince;
   SendOtpRepository sendOtpRepository = SendOtpRepository();
 
+  // Add FocusNode for better focus management
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    firstNameController.dispose();
+    lastNameController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    cityController.dispose();
+    postalCodeController.dispose();
+    addressController.dispose();
+    emailController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
@@ -93,14 +110,43 @@ class _RegisterState extends State<Register> {
         ),
         BlocListener<SendOtpBloc, SendOtpState>(
           listener: (context, state) {
+            debugPrint("🔄 SendOtpBloc State Changed: $state");
+            
             if (state is SendOtpSuccess) {
+              debugPrint("✅ OTP Sent Successfully, showing modal...");
               showOtpBottomSheet();
             }
 
             if (state is SendOtpError) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(state.error)));
+              debugPrint("❌ OTP Error: ${state.error}");
+              // Check if this is a timing issue after registration
+              if (state.error.contains('already been taken')) {
+                // This might be a timing issue, try again after a delay
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("⏳ Retrying OTP sending..."),
+                    backgroundColor: Colors.orange,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+                
+                // Retry after 3 seconds
+                Future.delayed(Duration(seconds: 3), () {
+                  final sendOtpEvent = SendOtpSubmittedEvent(
+                    email: emailController.text,
+                  );
+                  context.read<SendOtpBloc>().add(sendOtpEvent);
+                  debugPrint("🔄 RETRY SEND OTP DETAILS: ${sendOtpEvent.email}");
+                });
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("❌ OTP Error: ${state.error}"),
+                    backgroundColor: Colors.red,
+                    duration: Duration(seconds: 5),
+                  ),
+                );
+              }
             }
           },
         ),
@@ -198,8 +244,15 @@ class _RegisterState extends State<Register> {
                                                 isLastName: false,
                                               ),
                                       controller: firstNameController,
+                                      focusNode: _focusNode,
                                       onTapOutside: (event) {
-                                        FocusScope.of(context).unfocus();
+                                        // Only unfocus if the tap is outside the text field
+                                        if (!_focusNode.hasFocus) {
+                                          _focusNode.unfocus();
+                                        }
+                                      },
+                                      onEditingComplete: () {
+                                        _focusNode.unfocus();
                                       },
                                       cursorColor: AppColors.primary,
                                       decoration: InputDecoration(
