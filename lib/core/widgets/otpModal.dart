@@ -4,7 +4,8 @@ import 'package:together_test/core/config/theme/colors.dart';
 
 class OtpModal extends StatefulWidget {
   final void Function(String otpCode) onPress;
-  const OtpModal({super.key, required this.onPress});
+  final String email;
+  const OtpModal({super.key, required this.onPress, required this.email});
 
   @override
   State<OtpModal> createState() => _OtpModalState();
@@ -68,7 +69,7 @@ class _OtpModalState extends State<OtpModal> {
                       ),
                     ),
                     TextSpan(
-                      text: 'Yassinmustafa10@gmail.com ',
+                      text: widget.email,
                       style: TextStyle(
                         color: AppColors.primary,
                         fontSize: 16,

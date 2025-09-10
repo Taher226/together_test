@@ -3,16 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:together_test/core/utils/form_validators.dart';
 import 'package:together_test/core/widgets/otpModal.dart';
 import 'package:together_test/core/config/theme/colors.dart';
-import 'package:together_test/core/staticData/data.dart';
-import 'package:together_test/features/auth/data/repositories/send_otp_repository.dart';
+import 'package:together_test/features/auth/data/models/countries_model.dart';
+import 'package:together_test/features/auth/data/repositories/countries_repository.dart';
 import 'package:together_test/features/auth/presentation/bloc/register/register_bloc.dart';
 import 'package:together_test/features/auth/presentation/bloc/register/register_state.dart';
-import 'package:together_test/features/auth/presentation/bloc/sendOtp/send_otp_bloc.dart';
-import 'package:together_test/features/auth/presentation/bloc/sendOtp/send_otp_event.dart';
-import 'package:together_test/features/auth/presentation/bloc/sendOtp/send_otp_state.dart';
 import 'package:together_test/features/auth/presentation/bloc/verifyEmail/verify_email_bloc.dart';
 
 class Register extends StatefulWidget {
+  const Register({super.key});
+
   @override
   State<Register> createState() => _RegisterState();
 }
@@ -35,10 +34,34 @@ class _RegisterState extends State<Register> {
 
   String? selectedCountry;
   String? selectedProvince;
-  SendOtpRepository sendOtpRepository = SendOtpRepository();
 
   // Add FocusNode for better focus management
   final FocusNode _focusNode = FocusNode();
+
+  final CountriesRepository countriesRepo = CountriesRepository();
+  List<CountryModel> countries = [];
+  List<StateModel> states = [];
+  int? selectedCountryId;
+  int? selectedStateId;
+
+  Future<void> loadCountries() async {
+    try {
+      final result = await countriesRepo.getCountries();
+      setState(() {
+        countries = result.data;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() => isLoading = false);
+      print("Error: $e");
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadCountries();
+  }
 
   @override
   void dispose() {
@@ -56,6 +79,9 @@ class _RegisterState extends State<Register> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
     final args = ModalRoute.of(context)!.settings.arguments as Map;
     emailController.text = args['email'] ?? '';
     showOtpBottomSheet() {
@@ -64,6 +90,7 @@ class _RegisterState extends State<Register> {
         context: context,
         builder: (context) {
           return OtpModal(
+            email: emailController.text,
             onPress: (otpCode) {
               debugPrint("✅ OTP entered: $otpCode");
               context.read<VerifyEmailBloc>().add(
@@ -82,18 +109,8 @@ class _RegisterState extends State<Register> {
       listeners: [
         BlocListener<RegisterBloc, RegisterState>(
           listener: (context, abc) {
-            // if (state is RegisterLoading) {
-            //   setState(() => isLoading = true);
-            // } else {
-            //   setState(() => isLoading = false);
-            // }
-
             if (abc is RegisterSuccess) {
-              final sendOtpEvent = SendOtpSubmittedEvent(
-                email: emailController.text,
-              );
-              context.read<SendOtpBloc>().add(sendOtpEvent);
-              debugPrint("✅ SEND OTP DETAILS: ${sendOtpEvent.email}");
+              showOtpBottomSheet();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text("✅ Registered successfully, ${abc.message}"),
@@ -103,53 +120,18 @@ class _RegisterState extends State<Register> {
 
             if (abc is RegisterError) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Register Failed : ${abc.error}")),
+                SnackBar(
+                  backgroundColor: AppColors.error0,
+                  content: Text(
+                    "Register Failed : ${abc.error}",
+                    style: TextStyle(color: AppColors.neutral100),
+                  ),
+                ),
               );
             }
           },
         ),
-        BlocListener<SendOtpBloc, SendOtpState>(
-          listener: (context, state) {
-            debugPrint("🔄 SendOtpBloc State Changed: $state");
-            
-            if (state is SendOtpSuccess) {
-              debugPrint("✅ OTP Sent Successfully, showing modal...");
-              showOtpBottomSheet();
-            }
 
-            if (state is SendOtpError) {
-              debugPrint("❌ OTP Error: ${state.error}");
-              // Check if this is a timing issue after registration
-              if (state.error.contains('already been taken')) {
-                // This might be a timing issue, try again after a delay
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text("⏳ Retrying OTP sending..."),
-                    backgroundColor: Colors.orange,
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-                
-                // Retry after 3 seconds
-                Future.delayed(Duration(seconds: 3), () {
-                  final sendOtpEvent = SendOtpSubmittedEvent(
-                    email: emailController.text,
-                  );
-                  context.read<SendOtpBloc>().add(sendOtpEvent);
-                  debugPrint("🔄 RETRY SEND OTP DETAILS: ${sendOtpEvent.email}");
-                });
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text("❌ OTP Error: ${state.error}"),
-                    backgroundColor: Colors.red,
-                    duration: Duration(seconds: 5),
-                  ),
-                );
-              }
-            }
-          },
-        ),
         BlocListener<VerifyEmailBloc, VerifyEmailState>(
           listener: (context, stat) {
             if (stat is VerifyEmailSuccess) {
@@ -676,8 +658,8 @@ class _RegisterState extends State<Register> {
                                               ),
                                             ),
                                           ),
-                                          DropdownButtonFormField<String>(
-                                            value: selectedCountry,
+                                          DropdownButtonFormField<int>(
+                                            value: selectedCountryId,
                                             decoration: InputDecoration(
                                               focusedBorder: OutlineInputBorder(
                                                 borderRadius: BorderRadius.all(
@@ -701,16 +683,21 @@ class _RegisterState extends State<Register> {
                                             ),
                                             items:
                                                 countries.map((country) {
-                                                  return DropdownMenuItem<
-                                                    String
-                                                  >(
-                                                    value: country.value,
-                                                    child: Text(country.label),
+                                                  return DropdownMenuItem<int>(
+                                                    value: country.id,
+                                                    child: Text(country.name),
                                                   );
                                                 }).toList(),
                                             onChanged: (value) {
                                               setState(() {
-                                                selectedCountry = value;
+                                                selectedCountryId = value;
+                                                states =
+                                                    countries
+                                                        .firstWhere(
+                                                          (c) => c.id == value!,
+                                                        )
+                                                        .states;
+                                                selectedStateId = null;
                                               });
                                             },
                                           ),
@@ -720,7 +707,7 @@ class _RegisterState extends State<Register> {
                                     Container(
                                       width:
                                           MediaQuery.of(context).size.width *
-                                          0.45,
+                                          0.48,
                                       padding: EdgeInsets.symmetric(
                                         vertical: 10,
                                         horizontal: 5,
@@ -741,44 +728,53 @@ class _RegisterState extends State<Register> {
                                               ),
                                             ),
                                           ),
-                                          DropdownButtonFormField<String>(
-                                            value: selectedProvince,
-                                            decoration: InputDecoration(
-                                              focusedBorder: OutlineInputBorder(
-                                                borderRadius: BorderRadius.all(
-                                                  Radius.circular(8),
-                                                ),
-                                                borderSide: BorderSide(
-                                                  color: AppColors.placeholder,
-                                                ),
+                                          if (states.isNotEmpty)
+                                            DropdownButtonFormField<int>(
+                                              value: selectedStateId,
+                                              decoration: InputDecoration(
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                            Radius.circular(8),
+                                                          ),
+                                                      borderSide: BorderSide(
+                                                        color:
+                                                            AppColors
+                                                                .placeholder,
+                                                      ),
+                                                    ),
+                                                enabledBorder:
+                                                    OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                            Radius.circular(8),
+                                                          ),
+                                                      borderSide: BorderSide(
+                                                        color:
+                                                            AppColors
+                                                                .placeholder,
+                                                      ),
+                                                    ),
                                               ),
-                                              enabledBorder: OutlineInputBorder(
-                                                borderRadius: BorderRadius.all(
-                                                  Radius.circular(8),
-                                                ),
-                                                borderSide: BorderSide(
-                                                  color: AppColors.placeholder,
-                                                ),
+                                              icon: Icon(
+                                                Icons.keyboard_arrow_down,
                                               ),
+                                              items:
+                                                  states.map((state) {
+                                                    return DropdownMenuItem<
+                                                      int
+                                                    >(
+                                                      value: state.id,
+                                                      child: Text(state.name),
+                                                    );
+                                                  }).toList(),
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  selectedStateId = value;
+                                                });
+                                              },
                                             ),
-                                            icon: Icon(
-                                              Icons.keyboard_arrow_down,
-                                            ),
-                                            items:
-                                                provinces.map((province) {
-                                                  return DropdownMenuItem<
-                                                    String
-                                                  >(
-                                                    value: province.value,
-                                                    child: Text(province.label),
-                                                  );
-                                                }).toList(),
-                                            onChanged: (value) {
-                                              setState(() {
-                                                selectedProvince = value;
-                                              });
-                                            },
-                                          ),
                                         ],
                                       ),
                                     ),
@@ -1118,8 +1114,8 @@ class _RegisterState extends State<Register> {
                                                       .trim(),
                                               address:
                                                   addressController.text.trim(),
-                                              countryId: 1,
-                                              stateId: 1,
+                                              countryId: selectedCountryId,
+                                              stateId: selectedStateId,
                                             );
                                         context.read<RegisterBloc>().add(
                                           registerEvent,

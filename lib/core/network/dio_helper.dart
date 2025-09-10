@@ -17,14 +17,16 @@ class DioHelper {
         headers: ApiConfig.defaultHeaders,
       ),
     );
-    
+
     // Add interceptors for better logging
     if (ApiConfig.debugMode) {
-      dio.interceptors.add(LogInterceptor(
-        requestBody: true,
-        responseBody: true,
-        logPrint: (obj) => print('🌐 Dio Log: $obj'),
-      ));
+      dio.interceptors.add(
+        LogInterceptor(
+          requestBody: true,
+          responseBody: true,
+          logPrint: (obj) => print('🌐 Dio Log: $obj'),
+        ),
+      );
     }
   }
 
@@ -40,13 +42,13 @@ class DioHelper {
 
   static Future<Response> postData({
     required String url,
-    required Map<String, dynamic> data,
+    required Map<String, dynamic>? data,
     Map<String, dynamic>? query,
     String? token,
   }) async {
     dio.options.headers['Authorization'] =
         token != null ? 'Bearer $token' : null;
-    
+
     try {
       final response = await dio.post(
         url,
@@ -59,26 +61,15 @@ class DioHelper {
           },
         ),
       );
-      
+
       // Log the response for debugging
       ApiConfig.logApiResponse(url, response.statusCode ?? 0, response.data);
-      
+
       return response;
     } catch (e) {
       ApiConfig.logApiError(url, e.toString());
       rethrow;
     }
-  }
-
-  static Future<Response> putData({
-    required String url,
-    required Map<String, dynamic> data,
-    Map<String, dynamic>? query,
-    String? token,
-  }) async {
-    dio.options.headers['Authorization'] =
-        token != null ? 'Bearer $token' : null;
-    return await dio.put(url, data: data, queryParameters: query);
   }
 
   static Future<Response> deleteData({
@@ -89,5 +80,16 @@ class DioHelper {
     dio.options.headers['Authorization'] =
         token != null ? 'Bearer $token' : null;
     return await dio.delete(url, data: data);
+  }
+
+  static Future<Response> patchData({
+    required String url,
+    required Map<String, dynamic> data,
+    Map<String, dynamic>? query,
+    String? token,
+  }) async {
+    dio.options.headers['Authorization'] =
+        token != null ? 'Bearer $token' : null;
+    return await dio.patch(url, data: data, queryParameters: query);
   }
 }

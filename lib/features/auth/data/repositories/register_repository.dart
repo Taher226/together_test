@@ -33,10 +33,10 @@ class RegisterRepository {
           "address": address,
         },
       );
-      
+
       debugPrint("✅ Response Status: ${response.statusCode}");
       debugPrint("✅ Response Data: ${response.data}");
-      
+
       // Check if the response indicates an error
       if (response.statusCode != null && response.statusCode! >= 400) {
         // Handle HTTP error status codes
@@ -48,46 +48,45 @@ class RegisterRepository {
         } else if (response.statusCode == 500) {
           errorMessage = 'Server error: Please try again later';
         }
-        
+
         return RegisterModel(
           success: false,
           message: errorMessage,
-          messages: response.data['messages'] != null 
-            ? Map<String, List<String>>.from(
-                (response.data['messages'] as Map<String, dynamic>).map(
-                  (key, value) => MapEntry(
-                    key,
-                    List<String>.from(value.map((e) => e.toString())),
-                  ),
-                ),
-              )
-            : null,
+          messages:
+              response.data['messages'] != null
+                  ? Map<String, List<String>>.from(
+                    (response.data['messages'] as Map<String, dynamic>).map(
+                      (key, value) => MapEntry(
+                        key,
+                        List<String>.from(value.map((e) => e.toString())),
+                      ),
+                    ),
+                  )
+                  : null,
         );
       }
-      
+
       return RegisterModel.fromJson(response.data);
     } on DioException catch (e) {
       debugPrint("❌ DioException: ${e.message}");
       debugPrint("❌ DioException Response: ${e.response?.data}");
-      
+
       if (e.response != null && e.response?.data != null) {
         return RegisterModel.fromJson(e.response?.data);
       }
-      
+
       // Handle network errors
       String errorMessage = 'Network error occurred';
       if (e.type == DioExceptionType.connectionTimeout) {
-        errorMessage = 'Connection timeout. Please check your internet connection.';
+        errorMessage =
+            'Connection timeout. Please check your internet connection.';
       } else if (e.type == DioExceptionType.receiveTimeout) {
         errorMessage = 'Request timeout. Please try again.';
       } else if (e.type == DioExceptionType.connectionError) {
         errorMessage = 'No internet connection. Please check your network.';
       }
-      
-      return RegisterModel(
-        success: false,
-        message: errorMessage,
-      );
+
+      return RegisterModel(success: false, message: errorMessage);
     } catch (e) {
       debugPrint("❌ General Exception: $e");
       return RegisterModel(

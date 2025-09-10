@@ -192,9 +192,7 @@ class _EmailLoginState extends State<EmailLogin> {
           width: double.infinity,
           height: 48,
           child: ElevatedButton.icon(
-            onPressed: () {
-              Navigator.of(context).pushNamed('register');
-            },
+            onPressed: () {},
             icon: Icon(Icons.apple, size: 25, color: Colors.black),
             label: Text(
               'Log In With Apple',

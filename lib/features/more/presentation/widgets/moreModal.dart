@@ -6,12 +6,14 @@ class MoreModal extends StatelessWidget {
   final String title;
   final String redText;
   final String blueText;
+  final VoidCallback onPress;
   const MoreModal({
     super.key,
     required this.icon,
     required this.title,
     required this.redText,
     required this.blueText,
+    required this.onPress,
   });
 
   @override
@@ -51,7 +53,7 @@ class MoreModal extends StatelessWidget {
             height: 48,
             margin: EdgeInsets.symmetric(vertical: 10),
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: onPress,
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
