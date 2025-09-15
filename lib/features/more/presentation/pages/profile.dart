@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:together_test/core/widgets/otpModal.dart';
 import 'package:together_test/core/config/theme/colors.dart';
+import 'package:together_test/features/more/presentation/bloc/changeEmail/change_email_bloc.dart';
+import 'package:together_test/features/more/presentation/bloc/changePassword/change_password_bloc.dart';
+import 'package:together_test/features/more/presentation/bloc/checkPassword/check_password_bloc.dart';
 import 'package:together_test/features/more/presentation/bloc/editProfile/edit_profile_bloc.dart';
+import 'package:together_test/features/more/presentation/bloc/resetEmail/reset_email_bloc.dart';
 import 'package:together_test/features/more/presentation/widgets/changeEmailModal.dart';
 import 'package:together_test/features/more/presentation/widgets/changePasswordModal.dart';
 
@@ -19,7 +23,8 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   bool isEditMode = false;
   bool isPasswordChecked = true;
-
+  bool isChangePasswordError = false;
+  var passwordError;
   //////////////////MODALS VARIABLES/////////////////////////////////
   TextEditingController currentPasswordController = TextEditingController();
   TextEditingController changeCurrentPasswordController =
@@ -33,105 +38,28 @@ class _ProfileState extends State<Profile> {
   bool isNewEmailTrue = false;
   bool isChangeCurrentPasswordTrue = false;
 
-  openEnterPasswordModal() {
-    return showModalBottomSheet(
-      isScrollControlled: true,
-      context: context,
-      builder: (context) {
-        return ChangeEmailModal(
-          title: 'Enter your password',
-          subTitle: 'Please enter your current password to proceed',
-          inputTitle: 'Current Password',
-          controller: currentPasswordController,
-          onPress: () {
-            Navigator.pop(context);
-            openChangeEmailModal();
-            currentPasswordController.clear();
-          },
-        );
-      },
-    );
-  }
+  late Map args;
+  late TextEditingController firstNameController;
+  late TextEditingController lastNameController;
+  late TextEditingController addressController;
+  late TextEditingController emailController;
+  late TextEditingController phoneNumberController;
+  late TextEditingController passwordController;
 
-  openChangeEmailModal() {
-    return showModalBottomSheet(
-      isScrollControlled: true,
-      context: context,
-      builder: (context) {
-        return ChangeEmailModal(
-          title: 'Change Email',
-          subTitle:
-              'Please enter your email address accurately to stay up to date.',
-          inputTitle: 'New Email',
-          controller: newEmailController,
-          onPress: () {
-            Navigator.pop(context);
-            showOtpBottomSheet();
-            newEmailController.clear();
-          },
-        );
-      },
-    );
-  }
-
-  showOtpBottomSheet() {
-    return showModalBottomSheet(
-      isScrollControlled: true,
-      context: context,
-      builder: (context) {
-        return OtpModal(
-          email: newEmailController.text,
-          onPress: (otpCode) {
-            Navigator.of(context).pop();
-          },
-        );
-      },
-    );
-  }
-
-  openChangePasswordModal() {
-    return showModalBottomSheet(
-      isScrollControlled: true,
-      context: context,
-      builder: (context) {
-        return ChangePasswordModal(
-          title: 'Change Password',
-          subTitle: 'Set a new password (minimum 6 characters).',
-          currentPasswordTitle: 'Current Password',
-          newPasswordTitle: 'New Password',
-          reEnterPasswordTitle: 'Re-Enter New Password',
-          currentPasswordController: changeCurrentPasswordController,
-          newPasswordController: changeNewPasswordController,
-          reEnterPasswordController: changeReEnterPasswordController,
-          onPress: () {
-            Navigator.pop(context);
-          },
-        );
-      },
-    );
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    args = ModalRoute.of(context)!.settings.arguments as Map;
+    firstNameController = TextEditingController(text: args['firstName']);
+    lastNameController = TextEditingController(text: args['lastName']);
+    addressController = TextEditingController(text: args['address']);
+    emailController = TextEditingController(text: args['email']);
+    phoneNumberController = TextEditingController(text: args['phone']);
+    passwordController = TextEditingController(text: 'sssssssssssssss');
   }
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as Map;
-    TextEditingController firstNameController = TextEditingController(
-      text: args['firstName'],
-    );
-    TextEditingController lastNameController = TextEditingController(
-      text: args['lastName'],
-    );
-    TextEditingController addressController = TextEditingController(
-      text: args['address'],
-    );
-    TextEditingController emailController = TextEditingController(
-      text: args['email'],
-    );
-    TextEditingController phoneNumberController = TextEditingController(
-      text: args['phone'],
-    );
-    TextEditingController passwordController = TextEditingController(
-      text: 'sssssssssssssss',
-    );
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.neutral100,
@@ -445,6 +373,232 @@ class _ProfileState extends State<Profile> {
           },
         ),
       ),
+    );
+  }
+
+  openEnterPasswordModal() {
+    return showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (context) {
+        return BlocConsumer<CheckPasswordBloc, CheckPasswordState>(
+          listener: (context, state) {
+            if (state is CheckPasswordSuccess) {
+              Navigator.pop(context);
+              openChangeEmailModal();
+              currentPasswordController.clear();
+            }
+            if (state is CheckPasswordFailure) {
+              Navigator.pop(context);
+              currentPasswordController.clear();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: AppColors.error0,
+                  content: Text(
+                    state.error.toString(),
+                    style: TextStyle(color: AppColors.neutral100),
+                  ),
+                ),
+              );
+            }
+          },
+          builder: (context, state) {
+            if (state is CheckPasswordLoading) {
+              return Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              );
+            }
+            return ChangeEmailModal(
+              title: 'Enter your password',
+              subTitle: 'Please enter your current password to proceed',
+              inputTitle: 'Current Password',
+              controller: currentPasswordController,
+              onPress: () {
+                context.read<CheckPasswordBloc>().add(
+                  CheckPasswordRequestEvent(
+                    token: args['token'],
+                    password: currentPasswordController.text,
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  openChangeEmailModal() {
+    return showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (context) {
+        return BlocConsumer<ChangeEmailBloc, ChangeEmailState>(
+          listener: (context, state) {
+            if (state is ChangeEmailSuccess) {
+              Navigator.pop(context);
+              newEmailController.clear();
+              showOtpBottomSheet();
+            }
+            if (state is ChangeEmailFailure) {
+              Navigator.pop(context);
+              newEmailController.clear();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: AppColors.error0,
+                  content: Text(
+                    state.error.toString(),
+                    style: TextStyle(color: AppColors.neutral100),
+                  ),
+                ),
+              );
+            }
+          },
+          builder: (context, state) {
+            if (state is ChangeEmailLoading) {
+              return Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              );
+            }
+            return ChangeEmailModal(
+              title: 'Change Email',
+              subTitle:
+                  'Please enter your email address accurately to stay up to date.',
+              inputTitle: 'New Email',
+              controller: newEmailController,
+              onPress: () {
+                context.read<ChangeEmailBloc>().add(
+                  ChangeEmailRequestEvent(
+                    token: args['token'],
+                    email: newEmailController.text,
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  showOtpBottomSheet() {
+    return showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (context) {
+        return BlocConsumer<ResetEmailBloc, ResetEmailState>(
+          listener: (context, state) {
+            if (state is ResetEmailSuccess) {
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: AppColors.success0,
+                  content: Text(
+                    state.message.toString(),
+                    style: TextStyle(color: AppColors.neutral100),
+                  ),
+                ),
+              );
+            }
+            if (state is ResetEmailFailure) {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: AppColors.error0,
+                  content: Text(
+                    state.error.toString(),
+                    style: TextStyle(color: AppColors.neutral100),
+                  ),
+                ),
+              );
+            }
+          },
+          builder: (context, state) {
+            if (state is ResetEmailLoading) {
+              return Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              );
+            }
+            return OtpModal(
+              email: newEmailController.text,
+              onPress: (otpCode) {
+                context.read<ResetEmailBloc>().add(
+                  ResetEmailRequestEvent(
+                    newEmailController.text,
+                    args['token'],
+                    currentPasswordController.text,
+                    int.parse(otpCode),
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  openChangePasswordModal() {
+    return showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (context) {
+        return BlocConsumer<ChangePasswordBloc, ChangePasswordState>(
+          listener: (context, state) {
+            if (state is ChangePasswordSuccess) {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: AppColors.success0,
+                  content: Text(
+                    state.message,
+                    style: TextStyle(color: AppColors.neutral100),
+                  ),
+                ),
+              );
+            } else if (state is ChangePasswordFailure) {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: AppColors.error0,
+                  content: Text(
+                    state.error.toString(),
+                    style: TextStyle(color: AppColors.neutral100),
+                  ),
+                ),
+              );
+            }
+          },
+          builder: (context, state) {
+            if (state is ChangePasswordLoading) {
+              return Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              );
+            }
+
+            return ChangePasswordModal(
+              title: 'Change Password',
+              subTitle: 'Set a new password (minimum 6 characters).',
+              currentPasswordTitle: 'Current Password',
+              newPasswordTitle: 'New Password',
+              reEnterPasswordTitle: 'Re-Enter New Password',
+              currentPasswordController: changeCurrentPasswordController,
+              newPasswordController: changeNewPasswordController,
+              reEnterPasswordController: changeReEnterPasswordController,
+              onPress: () {
+                context.read<ChangePasswordBloc>().add(
+                  ChangePasswordRequestEvent(
+                    token: args['token'],
+                    currentPassword: changeCurrentPasswordController.text,
+                    newPassword: changeNewPasswordController.text,
+                    confirmPassword: changeReEnterPasswordController.text,
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 }

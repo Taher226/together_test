@@ -90,6 +90,17 @@ class DioHelper {
   }) async {
     dio.options.headers['Authorization'] =
         token != null ? 'Bearer $token' : null;
-    return await dio.patch(url, data: data, queryParameters: query);
+
+    return await dio.patch(
+      url,
+      data: data,
+      queryParameters: query,
+      options: Options(
+        validateStatus: (status) {
+          return status != null && status < 600;
+        },
+        contentType: 'multipart/form-data',
+      ),
+    );
   }
 }

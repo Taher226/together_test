@@ -7,7 +7,6 @@ class ChangePasswordModal extends StatefulWidget {
   final String currentPasswordTitle;
   final String newPasswordTitle;
   final String reEnterPasswordTitle;
-
   final TextEditingController currentPasswordController;
   final TextEditingController newPasswordController;
   final TextEditingController reEnterPasswordController;
@@ -24,7 +23,6 @@ class ChangePasswordModal extends StatefulWidget {
     required this.currentPasswordController,
     required this.newPasswordController,
     required this.reEnterPasswordController,
-
     required this.onPress,
   });
 

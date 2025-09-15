@@ -19,10 +19,18 @@ import 'package:together_test/features/common/presentation/pages/bottomTabs.dart
 import 'package:together_test/campaigns.dart';
 import 'package:together_test/donate.dart';
 import 'package:together_test/features/home/presentation/pages/home.dart';
+import 'package:together_test/features/more/data/repositories/change_email_repository.dart';
+import 'package:together_test/features/more/data/repositories/change_password_repository.dart';
+import 'package:together_test/features/more/data/repositories/check_password_repository.dart';
 import 'package:together_test/features/more/data/repositories/edit_profile_repository.dart';
 import 'package:together_test/features/more/data/repositories/logout_repository.dart';
+import 'package:together_test/features/more/data/repositories/reset_email_repository.dart';
+import 'package:together_test/features/more/presentation/bloc/changeEmail/change_email_bloc.dart';
+import 'package:together_test/features/more/presentation/bloc/changePassword/change_password_bloc.dart';
+import 'package:together_test/features/more/presentation/bloc/checkPassword/check_password_bloc.dart';
 import 'package:together_test/features/more/presentation/bloc/editProfile/edit_profile_bloc.dart';
 import 'package:together_test/features/more/presentation/bloc/logout/log_out_bloc.dart';
+import 'package:together_test/features/more/presentation/bloc/resetEmail/reset_email_bloc.dart';
 import 'package:together_test/features/more/presentation/pages/more.dart';
 import 'package:together_test/features/auth/presentation/pages/resetPassword.dart';
 import 'package:together_test/features/programs/presentation/pages/programs.dart';
@@ -56,6 +64,14 @@ void main() {
         ),
         BlocProvider(create: (_) => LogoutBloc(LogoutRepository())),
         BlocProvider(create: (_) => EditProfileBloc(EditProfileRepository())),
+        BlocProvider(
+          create: (_) => ChangePasswordBloc(ChangePasswordRepository()),
+        ),
+        BlocProvider(
+          create: (_) => CheckPasswordBloc(CheckPasswordRepository()),
+        ),
+        BlocProvider(create: (_) => ChangeEmailBloc(ChangeEmailRepository())),
+        BlocProvider(create: (_) => ResetEmailBloc(ResetEmailRepository())),
       ],
       child: MyApp(),
     ),

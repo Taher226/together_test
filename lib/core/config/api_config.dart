@@ -27,8 +27,20 @@ class ApiConfig {
 
   // Profile endpoints
   static const String showProfileEndpoint = 'api/v1/users/client/profile/show';
+
   static const String updateProfileEndpoint =
       'api/v1/users/client/profile/update';
+
+  static const String changePasswordEndpoint =
+      'api/v1/users/client/profile/change-password';
+
+  static const String changeEmailEndpoint1 =
+      'api/v1/users/client/profile/check-password';
+  static const String changeEmailEndpoint2 =
+      'api/v1/users/client/profile/change-email';
+  static const String changeEmailEndpoint3 =
+      'api/v1/users/client/profile/reset-email';
+
   // Timeouts
   static const int connectionTimeout = 10; // seconds
   static const int receiveTimeout = 10; // seconds
