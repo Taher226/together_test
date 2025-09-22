@@ -49,20 +49,26 @@ class ProfileData {
 
   factory ProfileData.fromJson(Map<String, dynamic> json) {
     return ProfileData(
-      id: json['id'],
-      firstName: json['first_name'],
-      lastName: json['last_name'],
-      email: json['email'],
-      photoUrl: json['photo_url'],
-      photoInfo: json['photo_info'],
-      phone: json['phone'],
-      countryCode: json['country_code'],
-      address: json['address'],
-      countryId: json['country_id'],
-      stateId: json['state_id'],
-      city: json['city'],
-      postalCode: json['postal_code'],
-      isSocial: json['is_social'],
+      id: json['id'] as String?,
+      firstName: json['first_name'] as String?,
+      lastName: json['last_name'] as String?,
+      email: json['email'] as String?,
+      photoUrl:
+          json['photo_url'] is String
+              ? json['photo_url'] as String
+              : (json['photo_url']?['url'] as String?),
+      photoInfo:
+          json['photo_info'] is String
+              ? json['photo_info'] as String
+              : json['photo_info']?.toString(),
+      phone: json['phone'] as String?,
+      countryCode: json['country_code'] as String?,
+      address: json['address'] as String?,
+      countryId: json['country_id'] as int?,
+      stateId: json['state_id'] as int?,
+      city: json['city'] as String?,
+      postalCode: json['postal_code'] as String?,
+      isSocial: json['is_social'] as bool?,
     );
   }
 

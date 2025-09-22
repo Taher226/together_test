@@ -11,10 +11,10 @@ class More extends StatelessWidget {
   const More({super.key});
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as Map;
-    // final args =
-    //     ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>? ??
-    //     {};
+    // final args = ModalRoute.of(context)!.settings.arguments as Map;
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>? ??
+        {};
 
     openLogoutModal() {
       return showModalBottomSheet(
@@ -112,16 +112,21 @@ class More extends StatelessWidget {
                                     children: [
                                       CircleAvatar(
                                         backgroundColor: Colors.grey,
-                                        child:
+                                        backgroundImage:
                                             data!.photoUrl != null &&
                                                     data.photoUrl!.isNotEmpty
-                                                ? Image.network(
+                                                ? NetworkImage(
                                                   data.photoUrl.toString(),
                                                 )
-                                                : Icon(
+                                                : null,
+                                        child:
+                                            data.photoUrl == null ||
+                                                    data.photoUrl!.isEmpty
+                                                ? Icon(
                                                   Icons.person,
                                                   color: Colors.black,
-                                                ),
+                                                )
+                                                : null,
                                       ),
                                       SizedBox(width: 20),
                                       Column(

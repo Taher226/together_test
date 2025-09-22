@@ -112,26 +112,27 @@ class _ProfileState extends State<Profile> {
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          args['photoUrl'] != null
-                              ? Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: Image.network(
-                                  args['photoUrl'].toString(),
-                                ),
-                              )
-                              : Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.neutral100,
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: Icon(
-                                  Icons.person,
-                                  size: 56,
-                                  color: AppColors.primary,
-                                ),
-                              ),
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundColor:
+                                args['photoUrl'] != null
+                                    ? Colors.white
+                                    : AppColors.neutral100,
+                            backgroundImage:
+                                args['photoUrl'] != null
+                                    ? NetworkImage(args['photoUrl'].toString())
+                                    : null,
+
+                            child:
+                                args['photoUrl'] == null
+                                    ? Icon(
+                                      Icons.person,
+                                      size: 56,
+                                      color: AppColors.primary,
+                                    )
+                                    : null,
+                          ),
+
                           SizedBox(height: 10),
                           isEditMode == true
                               ? InkWell(
@@ -386,11 +387,9 @@ class _ProfileState extends State<Profile> {
             if (state is CheckPasswordSuccess) {
               Navigator.pop(context);
               openChangeEmailModal();
-              currentPasswordController.clear();
             }
             if (state is CheckPasswordFailure) {
               Navigator.pop(context);
-              currentPasswordController.clear();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   backgroundColor: AppColors.error0,
@@ -437,12 +436,10 @@ class _ProfileState extends State<Profile> {
           listener: (context, state) {
             if (state is ChangeEmailSuccess) {
               Navigator.pop(context);
-              newEmailController.clear();
               showOtpBottomSheet();
             }
             if (state is ChangeEmailFailure) {
               Navigator.pop(context);
-              newEmailController.clear();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   backgroundColor: AppColors.error0,

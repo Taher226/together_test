@@ -10,9 +10,14 @@ class ResetEmailRepository {
     required int otp,
   }) async {
     try {
-      final response = await DioHelper.patchData(
+      final response = await DioHelper.postData(
         url: ApiConfig.changeEmailEndpoint3,
-        data: {'email': email, 'password': password, 'otp': otp},
+        data: {
+          'email': email,
+          'password': password,
+          'otp': otp,
+          '_method': 'patch',
+        },
         token: token,
       );
       return ResetEmailModel.fromJson(response.data);
