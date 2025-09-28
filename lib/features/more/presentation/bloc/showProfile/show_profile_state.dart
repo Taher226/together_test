@@ -10,10 +10,10 @@ class ShowProfileInitial extends ShowProfileState {}
 class ShowProfileLoading extends ShowProfileState {}
 
 class ShowProfileSuccess extends ShowProfileState {
-  final ShowProfileModel model;
-  ShowProfileSuccess(this.model);
+  final ShowProfileEntity profile;
+  ShowProfileSuccess(this.profile);
   @override
-  List<Object?> get props => [model];
+  List<Object?> get props => [profile];
 }
 
 class ShowProfileFailure extends ShowProfileState {

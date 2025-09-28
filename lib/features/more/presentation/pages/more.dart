@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:together_test/core/config/theme/colors.dart';
-import 'package:together_test/features/more/data/repositories/show_profile_repository.dart';
+import 'package:together_test/features/more/data/repositories/show_profile_repository_impl.dart';
+import 'package:together_test/features/more/domain/usecases/show_profile_usecase.dart';
 import 'package:together_test/features/more/presentation/bloc/logout/log_out_bloc.dart';
 import 'package:together_test/features/more/presentation/bloc/showProfile/show_profile_bloc.dart';
 import 'package:together_test/features/more/presentation/widgets/moreButton.dart';
@@ -55,7 +56,7 @@ class More extends StatelessWidget {
     return BlocProvider(
       create:
           (_) =>
-              ShowProfileBloc(ShowProfileRepository())
+              ShowProfileBloc(ShowProfileUseCase(ShowProfileRepositoryImpl()))
                 ..add(ShowProfileRequestEvent(args['token'])),
 
       child: Scaffold(
@@ -98,7 +99,7 @@ class More extends StatelessWidget {
                                   ),
                                 );
                               } else if (state is ShowProfileSuccess) {
-                                final data = state.model.data;
+                                final data = state.profile;
                                 return Container(
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8),
@@ -113,7 +114,7 @@ class More extends StatelessWidget {
                                       CircleAvatar(
                                         backgroundColor: Colors.grey,
                                         backgroundImage:
-                                            data!.photoUrl != null &&
+                                            data.photoUrl != null &&
                                                     data.photoUrl!.isNotEmpty
                                                 ? NetworkImage(
                                                   data.photoUrl.toString(),
