@@ -136,9 +136,7 @@ class _ProfileState extends State<Profile> {
                           SizedBox(height: 10),
                           isEditMode == true
                               ? InkWell(
-                                onTap: () {
-                                  print('Change photo');
-                                },
+                                onTap: () {},
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -263,7 +261,7 @@ class _ProfileState extends State<Profile> {
                               height: 48,
                               child: ElevatedButton(
                                 onPressed: () {
-                                  print(args);
+                                  debugPrint('arguments : $args');
                                   setState(() {
                                     isEditMode = true;
                                   });

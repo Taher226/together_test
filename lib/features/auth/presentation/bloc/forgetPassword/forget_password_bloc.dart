@@ -1,16 +1,16 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:together_test/features/auth/data/repositories/forget_password_repository.dart';
+import 'package:together_test/features/auth/domain/useCases/forget_password_useCase.dart';
 import 'package:together_test/features/auth/presentation/bloc/forgetPassword/forget_password_state.dart';
 part 'forget_password_event.dart';
 
 class ForgetPasswordBloc
     extends Bloc<ForgetPasswordEvent, ForgetPasswordState> {
-  final ForgetPasswordRepository repository;
-  ForgetPasswordBloc(this.repository) : super(ForgetPasswordInitial()) {
+  final ForgetPasswordUseCase useCase;
+  ForgetPasswordBloc(this.useCase) : super(ForgetPasswordInitial()) {
     on<ForgetPasswordRequestEvent>((event, emit) async {
       emit(ForgetPasswordLoading());
-      final result = await repository.forgetPassword(email: event.email);
+      final result = await useCase.call(event.email);
       if (result.success == true) {
         emit(ForgetPasswordSuccess(result.message ?? 'Success'));
       } else {

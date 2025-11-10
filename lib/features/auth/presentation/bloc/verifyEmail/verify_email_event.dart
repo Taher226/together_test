@@ -2,7 +2,7 @@ part of 'verify_email_bloc.dart';
 
 abstract class VerifyEmailEvent extends Equatable {
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 class VerifyEmailRequestEvent extends VerifyEmailEvent {
@@ -12,5 +12,5 @@ class VerifyEmailRequestEvent extends VerifyEmailEvent {
   VerifyEmailRequestEvent({required this.email, required this.otp});
 
   @override
-  List<Object> get props => [email, otp];
+  List<Object?> get props => [email, otp];
 }

@@ -12,12 +12,12 @@ class HomeProgramsInitial extends HomeProgramsState {}
 class HomeProgramsLoading extends HomeProgramsState {}
 
 class HomeProgramsSuccess extends HomeProgramsState {
-  final List<Program> programs;
+  final HomeProgramsEntity entity;
 
-  const HomeProgramsSuccess(this.programs);
+  const HomeProgramsSuccess(this.entity);
 
   @override
-  List<Object?> get props => [programs];
+  List<Object?> get props => [entity];
 }
 
 class HomeProgramsFailure extends HomeProgramsState {

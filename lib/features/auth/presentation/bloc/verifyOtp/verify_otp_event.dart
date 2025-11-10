@@ -11,7 +11,7 @@ class VerifyOtpRequestEvent extends VerifyOtpEvent {
   final String email;
   final int otp;
 
-  VerifyOtpRequestEvent({required this.email, required this.otp});
+  const VerifyOtpRequestEvent({required this.email, required this.otp});
 
   @override
   List<Object?> get props => [email, otp];

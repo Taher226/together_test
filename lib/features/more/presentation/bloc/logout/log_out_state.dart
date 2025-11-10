@@ -10,10 +10,10 @@ class LogoutInitial extends LogoutState {}
 class LogoutLoading extends LogoutState {}
 
 class LogoutSuccess extends LogoutState {
-  final LogoutModel model;
-  LogoutSuccess(this.model);
+  final LogoutEntity entity;
+  LogoutSuccess(this.entity);
   @override
-  List<Object?> get props => [model];
+  List<Object?> get props => [entity];
 }
 
 class LogoutFailure extends LogoutState {

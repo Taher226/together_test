@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:together_test/core/config/theme/colors.dart';
-import 'package:together_test/features/home/data/repositories/home_programs_repository.dart';
+import 'package:together_test/features/home/data/repositories/home_programs_repository_Impl.dart';
+import 'package:together_test/features/home/domain/useCases/home_programs_useCase.dart';
 import 'package:together_test/features/home/presentation/bloc/homePrograms/home_programs_bloc.dart';
 
 class ProgramsSection extends StatelessWidget {
@@ -11,9 +12,9 @@ class ProgramsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create:
-          (context) =>
-              HomeProgramsBloc(HomeProgramsRepository())
-                ..add(FetchHomeProgramsEvent(limit: 5)),
+          (context) => HomeProgramsBloc(
+            HomeProgramsUseCase(HomeProgramsRepositoryImpl()),
+          )..add(FetchHomeProgramsEvent(limit: 5)),
       child: BlocBuilder<HomeProgramsBloc, HomeProgramsState>(
         builder: (context, state) {
           if (state is HomeProgramsLoading) {
@@ -21,7 +22,7 @@ class ProgramsSection extends StatelessWidget {
               child: CircularProgressIndicator(color: AppColors.primary),
             );
           } else if (state is HomeProgramsSuccess) {
-            if (state.programs.length > 0) {
+            if (state.entity.programs.isNotEmpty) {
               return Column(
                 children: [
                   Container(
@@ -58,9 +59,9 @@ class ProgramsSection extends StatelessWidget {
                     height: 150,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: state.programs.length,
+                      itemCount: state.entity.programs.length,
                       itemBuilder: (context, i) {
-                        final program = state.programs[i];
+                        final program = state.entity.programs[i];
 
                         return InkWell(
                           onTap: () {

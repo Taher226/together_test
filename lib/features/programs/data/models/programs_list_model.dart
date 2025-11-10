@@ -19,8 +19,9 @@ class Program {
   final String? description;
   final String? about;
   final String status;
-  final String language;
-  final String languageName;
+  final int? languageId;
+  final String? languageName;
+  final String? languageCode;
   final String? photoUrl;
   final String? bannerUrl;
   final Info? photoInfo;
@@ -37,8 +38,9 @@ class Program {
     this.description,
     this.about,
     required this.status,
-    required this.language,
-    required this.languageName,
+    this.languageId,
+    this.languageName,
+    this.languageCode,
     this.photoUrl,
     this.bannerUrl,
     this.photoInfo,
@@ -57,8 +59,9 @@ class Program {
       description: json['description'],
       about: json['about'],
       status: json['status'],
-      language: json['language'],
+      languageId: json['language_id'],
       languageName: json['language_name'],
+      languageCode: json['language_code'],
       photoUrl: json['photo_url'],
       bannerUrl: json['banner_url'],
       photoInfo:

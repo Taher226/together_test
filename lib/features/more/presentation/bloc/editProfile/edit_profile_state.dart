@@ -10,10 +10,10 @@ class EditProfileInitial extends EditProfileState {}
 class EditProfileLoading extends EditProfileState {}
 
 class EditProfileSuccess extends EditProfileState {
-  final EditProfileModel model;
-  EditProfileSuccess(this.model);
+  final EditProfileEntity entity;
+  EditProfileSuccess(this.entity);
   @override
-  List<Object?> get props => [model];
+  List<Object?> get props => [entity];
 }
 
 class EditProfileFailure extends EditProfileState {

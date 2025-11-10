@@ -55,7 +55,7 @@ class _PasswordLoginState extends State<PasswordLogin> {
                   'bottomTabs',
                   arguments: {"token": state.token},
                 );
-                debugPrint("✅ TOKENNNNN: ${state.token}");
+                debugPrint("✅✅✅✅ TOKEN: ${state.token}");
               } else if (state is LoginError) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(

@@ -1,18 +1,18 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:together_test/features/more/data/repositories/change_password_repository.dart';
+import 'package:together_test/features/more/domain/usecases/change_password_useCase.dart';
 
 part 'change_password_event.dart';
 part 'change_password_state.dart';
 
 class ChangePasswordBloc
     extends Bloc<ChangePasswordEvent, ChangePasswordState> {
-  final ChangePasswordRepository repository;
-  ChangePasswordBloc(this.repository) : super(ChangePasswordInitial()) {
+  final ChangePasswordUseCase useCase;
+  ChangePasswordBloc(this.useCase) : super(ChangePasswordInitial()) {
     on<ChangePasswordRequestEvent>((event, emit) async {
       emit(ChangePasswordLoading());
       try {
-        final result = await repository.changePassword(
+        final result = await useCase.call(
           currentPassword: event.currentPassword,
           newPassword: event.newPassword,
           confirmPassword: event.confirmPassword,

@@ -1,19 +1,19 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:together_test/features/programs/data/models/program_details_model.dart';
-import 'package:together_test/features/programs/data/repositories/program_details_repository.dart';
+import 'package:together_test/features/programs/domain/entities/program_details_entity.dart';
+import 'package:together_test/features/programs/domain/useCases/program_details_useCase.dart';
 
 part 'program_details_event.dart';
 part 'program_details_state.dart';
 
 class ProgramDetailsBloc
     extends Bloc<ProgramDetailsEvent, ProgramDetailsState> {
-  final ProgramDetailsRepository repository;
-  ProgramDetailsBloc(this.repository) : super(ProgramDetailsInitial()) {
+  final ProgramDetailsUseCase useCase;
+  ProgramDetailsBloc(this.useCase) : super(ProgramDetailsInitial()) {
     on<ProgramDetailsRequestEvent>((event, emit) async {
       emit(ProgramDetailsLoading());
       try {
-        final details = await repository.getProgramDetails(id: event.id);
+        final details = await useCase.call(id: event.id);
         if (details.data != null) {
           emit(ProgramDetailsSuccess(details));
         } else {

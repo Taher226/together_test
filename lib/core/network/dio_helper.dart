@@ -87,6 +87,7 @@ class DioHelper {
     required Map<String, dynamic> data,
     Map<String, dynamic>? query,
     String? token,
+    bool? isRawData,
   }) async {
     dio.options.headers['Authorization'] =
         token != null ? 'Bearer $token' : null;
@@ -99,7 +100,8 @@ class DioHelper {
         validateStatus: (status) {
           return status != null && status < 600;
         },
-        contentType: 'multipart/form-data',
+        contentType:
+            isRawData == true ? 'application/json' : 'multipart/form-data',
       ),
     );
   }

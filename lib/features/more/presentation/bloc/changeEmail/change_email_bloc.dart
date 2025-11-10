@@ -1,17 +1,17 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:together_test/features/more/data/repositories/change_email_repository.dart';
+import 'package:together_test/features/more/domain/usecases/change_email_useCase.dart';
 
 part 'change_email_event.dart';
 part 'change_email_state.dart';
 
 class ChangeEmailBloc extends Bloc<ChangeEmailEvent, ChangeEmailState> {
-  final ChangeEmailRepository repository;
-  ChangeEmailBloc(this.repository) : super(ChangeEmailInitial()) {
+  final ChangeEmailUseCase useCase;
+  ChangeEmailBloc(this.useCase) : super(ChangeEmailInitial()) {
     on<ChangeEmailRequestEvent>((event, emit) async {
       emit(ChangeEmailLoading());
       try {
-        final result = await repository.changeEmail(
+        final result = await useCase.call(
           email: event.email,
           token: event.token,
         );

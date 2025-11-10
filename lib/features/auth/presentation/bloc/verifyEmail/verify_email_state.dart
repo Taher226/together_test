@@ -10,10 +10,10 @@ class VerifyEmailInitial extends VerifyEmailState {}
 class VerifyEmailLoading extends VerifyEmailState {}
 
 class VerifyEmailSuccess extends VerifyEmailState {
-  final VerifyEmailModel model;
-  VerifyEmailSuccess(this.model);
+  final VerifyEmailEntity entity;
+  VerifyEmailSuccess(this.entity);
   @override
-  List<Object?> get props => [model];
+  List<Object?> get props => [entity];
 }
 
 class VerifyEmailError extends VerifyEmailState {

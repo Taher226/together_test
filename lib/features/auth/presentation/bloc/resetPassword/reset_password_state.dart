@@ -10,11 +10,11 @@ class ResetPasswordInitial extends ResetPasswordState {}
 class ResetPasswordLoading extends ResetPasswordState {}
 
 class ResetPasswordSuccess extends ResetPasswordState {
-  final ResetPasswordModel model;
-  ResetPasswordSuccess(this.model);
+  final ResetPasswordEntity entity;
+  ResetPasswordSuccess(this.entity);
 
   @override
-  List<Object?> get props => [model];
+  List<Object?> get props => [entity];
 }
 
 class ResetPasswordError extends ResetPasswordState {

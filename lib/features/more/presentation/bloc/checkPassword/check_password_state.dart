@@ -10,10 +10,10 @@ class CheckPasswordInitial extends CheckPasswordState {}
 class CheckPasswordLoading extends CheckPasswordState {}
 
 class CheckPasswordSuccess extends CheckPasswordState {
-  final CheckPasswordModel model;
-  CheckPasswordSuccess(this.model);
+  final CheckPasswordEntity entity;
+  CheckPasswordSuccess(this.entity);
   @override
-  List<Object?> get props => [model];
+  List<Object?> get props => [entity];
 }
 
 class CheckPasswordFailure extends CheckPasswordState {

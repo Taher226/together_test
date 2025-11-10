@@ -1,17 +1,16 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:together_test/features/more/data/repositories/reset_email_repository.dart';
-
+import 'package:together_test/features/more/domain/usecases/reset_email_useCase.dart';
 part 'reset_email_event.dart';
 part 'reset_email_state.dart';
 
 class ResetEmailBloc extends Bloc<ResetEmailEvent, ResetEmailState> {
-  final ResetEmailRepository repository;
-  ResetEmailBloc(this.repository) : super(ResetEmailInitial()) {
+  final ResetEmailUseCase useCase;
+  ResetEmailBloc(this.useCase) : super(ResetEmailInitial()) {
     on<ResetEmailRequestEvent>((event, emit) async {
       emit(ResetEmailLoading());
       try {
-        final result = await repository.resetEmail(
+        final result = await useCase.call(
           token: event.token,
           email: event.email,
           password: event.password,

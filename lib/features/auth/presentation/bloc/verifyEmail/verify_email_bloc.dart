@@ -1,27 +1,24 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:together_test/features/auth/data/models/verify_email_model.dart';
-import 'package:together_test/features/auth/data/repositories/verify_email_repository.dart';
+import 'package:together_test/features/auth/domain/entities/verify_email_entity.dart';
+import 'package:together_test/features/auth/domain/useCases/verify_email_useCase.dart';
 
 part 'verify_email_event.dart';
 part 'verify_email_state.dart';
 
 class VerifyEmailBloc extends Bloc<VerifyEmailEvent, VerifyEmailState> {
-  final VerifyEmailRepository repository;
-  VerifyEmailBloc(this.repository) : super(VerifyEmailInitial()) {
+  final VerifyEmailUseCase useCase;
+  VerifyEmailBloc(this.useCase) : super(VerifyEmailInitial()) {
     on<VerifyEmailRequestEvent>((event, emit) async {
       emit(VerifyEmailLoading());
       try {
-        final response = await repository.verifyEmail(
-          email: event.email,
-          otp: event.otp,
-        );
-        if (response.success == true) {
-          emit(VerifyEmailSuccess(response));
+        final result = await useCase.call(email: event.email, otp: event.otp);
+        if (result.success == true) {
+          emit(VerifyEmailSuccess(result));
         } else {
           emit(
             VerifyEmailError(
-              response.messages?['email']?.first ?? "Unknown error",
+              result.messages?['email']?.first ?? "Unknown error",
             ),
           );
         }

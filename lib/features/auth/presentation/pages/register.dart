@@ -49,10 +49,10 @@ class _RegisterState extends State<Register> {
       final result = await countriesRepo.getCountries();
       setState(() {
         countries = result.data;
-        isLoading = false;
+        //  isLoading = false;
       });
     } catch (e) {
-      setState(() => isLoading = false);
+      //setState(() => isLoading = false);
       print("Error: $e");
     }
   }
@@ -141,7 +141,7 @@ class _RegisterState extends State<Register> {
               Navigator.of(context).pop();
               Navigator.of(context).pushReplacementNamed(
                 'bottomTabs',
-                arguments: {'data': stat.model.data},
+                arguments: {'data': stat.entity.data},
               );
             }
 

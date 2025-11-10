@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:together_test/core/config/theme/colors.dart';
-import 'package:together_test/features/programs/data/repositories/programs_list_repository.dart';
+import 'package:together_test/features/programs/data/repositories/programs_list_repository_impl.dart';
+import 'package:together_test/features/programs/domain/useCases/programs_list_useCase.dart';
 import 'package:together_test/features/programs/presentation/bloc/programsList/programs_list_bloc.dart';
 
 class Programs extends StatelessWidget {
@@ -11,9 +12,9 @@ class Programs extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create:
-          (context) =>
-              ProgramsListBloc(ProgramsListRepository())
-                ..add(FetchProgramsListEvent()),
+          (context) => ProgramsListBloc(
+            ProgramsListUseCase(ProgramsListRepositoryImpl()),
+          )..add(FetchProgramsListEvent()),
       child: Scaffold(
         appBar: AppBar(
           title: Text(
@@ -76,9 +77,9 @@ class Programs extends StatelessWidget {
                             SizedBox(
                               height: MediaQuery.of(context).size.height,
                               child: ListView.builder(
-                                itemCount: state.programs.data.length,
+                                itemCount: state.entity.programs.length,
                                 itemBuilder: (context, index) {
-                                  final program = state.programs.data[index];
+                                  final program = state.entity.programs[index];
                                   return InkWell(
                                     onTap: () {
                                       Navigator.of(context).pushNamed(

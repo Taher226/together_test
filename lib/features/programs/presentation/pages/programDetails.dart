@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:together_test/core/config/theme/colors.dart';
 import 'package:together_test/core/staticData/data.dart';
-import 'package:together_test/features/programs/data/repositories/program_details_repository.dart';
+import 'package:together_test/features/programs/data/repositories/program_details_repository_impl.dart';
+import 'package:together_test/features/programs/domain/useCases/program_details_useCase.dart';
 import 'package:together_test/features/programs/presentation/bloc/programDetails/program_details_bloc.dart';
 
 class ProgramDetails extends StatefulWidget {
@@ -43,9 +44,9 @@ class _ProgramDetailsState extends State<ProgramDetails> {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
     return BlocProvider(
       create:
-          (context) =>
-              ProgramDetailsBloc(ProgramDetailsRepository())
-                ..add(ProgramDetailsRequestEvent(args['id'])),
+          (context) => ProgramDetailsBloc(
+            ProgramDetailsUseCase(ProgramDetailsRepositoryImpl()),
+          )..add(ProgramDetailsRequestEvent(args['id'])),
       child: Scaffold(
         appBar: AppBar(
           title: Text(
@@ -115,8 +116,8 @@ class _ProgramDetailsState extends State<ProgramDetails> {
                 ),
               );
             } else if (state is ProgramDetailsSuccess) {
-              final program = state.program.data!;
-              final project = program.projects;
+              final program = state.entity..data!;
+              final project = program.data?.projects;
               final selectedProjectObj =
                   project != null && project.isNotEmpty
                       ? project.firstWhere(
@@ -140,18 +141,14 @@ class _ProgramDetailsState extends State<ProgramDetails> {
                             SizedBox(
                               height: 63,
                               child: ListView.builder(
-                                itemCount: state.program.data!.projects!.length,
+                                itemCount: state.entity.data!.projects!.length,
                                 scrollDirection: Axis.horizontal,
                                 itemBuilder: (context, i) {
                                   return InkWell(
                                     onTap: () {
                                       setState(() {
                                         selectedProject =
-                                            state
-                                                .program
-                                                .data!
-                                                .projects![i]
-                                                .id!;
+                                            state.entity.data!.projects![i].id!;
                                       });
                                     },
                                     child: Container(
@@ -161,7 +158,7 @@ class _ProgramDetailsState extends State<ProgramDetails> {
                                           color:
                                               selectedProject ==
                                                       state
-                                                          .program
+                                                          .entity
                                                           .data!
                                                           .projects![i]
                                                           .id!
@@ -175,7 +172,7 @@ class _ProgramDetailsState extends State<ProgramDetails> {
                                       child:
                                           selectedProject ==
                                                   state
-                                                      .program
+                                                      .entity
                                                       .data!
                                                       .projects![i]
                                                       .id!
@@ -189,7 +186,7 @@ class _ProgramDetailsState extends State<ProgramDetails> {
                                                   SizedBox(width: 5),
                                                   Text(
                                                     state
-                                                        .program
+                                                        .entity
                                                         .data!
                                                         .projects![i]
                                                         .name!,
@@ -204,7 +201,7 @@ class _ProgramDetailsState extends State<ProgramDetails> {
                                               )
                                               : Text(
                                                 state
-                                                    .program
+                                                    .entity
                                                     .data!
                                                     .projects![i]
                                                     .name!,
@@ -219,7 +216,7 @@ class _ProgramDetailsState extends State<ProgramDetails> {
                                 },
                               ),
                             ),
-                            program.type == 'detailed'
+                            program.data?.type == 'detailed'
                                 ? Column(
                                   children: [
                                     SizedBox(height: 10),
@@ -228,7 +225,7 @@ class _ProgramDetailsState extends State<ProgramDetails> {
                                         horizontal: 15,
                                       ),
                                       child: Text(
-                                        state.program.data!.description!,
+                                        state.entity.data!.description!,
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500,
@@ -959,7 +956,7 @@ class _ProgramDetailsState extends State<ProgramDetails> {
                                             ),
                                             SizedBox(height: 10),
                                             Html(
-                                              data: program.about ?? '',
+                                              data: program.data?.about ?? '',
                                               style: {
                                                 "body": Style(
                                                   fontSize: FontSize(14.0),

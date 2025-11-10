@@ -10,10 +10,10 @@ class VerifyOtpInitial extends VerifyOtpState {}
 class VerifyOtpLoading extends VerifyOtpState {}
 
 class VerifyOtpSuccess extends VerifyOtpState {
-  final VerifyOtpModel model;
-  VerifyOtpSuccess(this.model);
+  final VerifyOtpEntity entity;
+  VerifyOtpSuccess(this.entity);
   @override
-  List<Object?> get props => [model];
+  List<Object?> get props => [entity];
 }
 
 class VerifyOtpError extends VerifyOtpState {

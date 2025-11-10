@@ -10,8 +10,8 @@ class ProgramsListInitial extends ProgramsListState {}
 class ProgramsListLoading extends ProgramsListState {}
 
 class ProgramsListSuccess extends ProgramsListState {
-  final ProgramsListModel programs;
-  ProgramsListSuccess(this.programs);
+  final ProgramsListEntity entity;
+  ProgramsListSuccess(this.entity);
 }
 
 class ProgramsListFailure extends ProgramsListState {
